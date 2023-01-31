@@ -1,5 +1,7 @@
-#pragma once
+// Foreign.hpp by Mzying2001
+// GitHub: https://github.com/Mzying2001/Foreign
 
+#pragma once
 #include <Windows.h>
 
 namespace Foreign
