@@ -59,6 +59,11 @@ namespace Foreign
             Write(&value);
         }
 
+        operator T()
+        {
+            return Read();
+        }
+
         T operator=(T value)
         {
             Write(&value);
