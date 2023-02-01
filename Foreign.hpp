@@ -3,6 +3,7 @@
 
 #pragma once
 #include <Windows.h>
+#include <TlHelp32.h>
 
 namespace Foreign
 {
@@ -189,6 +190,30 @@ namespace Foreign
     bool CloseProcessHandle(HANDLE hProcess)
     {
         return CloseHandle(hProcess);
+    }
+
+    LPVOID GetProcessBaseAddress(DWORD pid)
+    {
+        LPVOID baseAddress = NULL;
+        MODULEENTRY32 me32 = {0};
+        me32.dwSize = sizeof(me32);
+        HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+        if (hModuleSnap == INVALID_HANDLE_VALUE)
+        {
+            return baseAddress;
+        }
+        if (Module32First(hModuleSnap, &me32))
+        {
+            baseAddress = (LPVOID)me32.modBaseAddr;
+        }
+        CloseHandle(hModuleSnap);
+        return baseAddress;
+    }
+
+    LPVOID GetProcessBaseAddress(HANDLE hProcess)
+    {
+        DWORD pid = GetProcessId(hProcess);
+        return GetProcessBaseAddress(pid);
     }
 
     FVoidPointer Malloc(HANDLE hProcess, SIZE_T size)
