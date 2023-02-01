@@ -49,12 +49,12 @@ namespace Foreign
             return ret;
         }
 
-        bool Write(T *pIn, SIZE_T *pNumOfBytesWritten = NULL)
+        bool Write(const T *pIn, SIZE_T *pNumOfBytesWritten = NULL)
         {
             return WriteProcessMemory(_refPtr.ProcessHandle(), _refPtr.Address(), pIn, sizeof(T), pNumOfBytesWritten);
         }
 
-        void Write(T value)
+        void Write(const T &value)
         {
             Write(&value);
         }
@@ -64,10 +64,10 @@ namespace Foreign
             return Read();
         }
 
-        T operator=(T value)
+        FReference<T> &operator=(const T &value)
         {
             Write(&value);
-            return value;
+            return *this;
         }
     };
 
@@ -77,21 +77,6 @@ namespace Foreign
     public:
         FPointer(HANDLE processHandle, LPVOID address) : FVoidPointer(processHandle, address) {}
         FPointer(HANDLE processHandle) : FVoidPointer(processHandle, NULL) {}
-
-        FReference<T> GetRef() const
-        {
-            return FReference<T>(*this);
-        }
-
-        T Read() const
-        {
-            return GetRef().Read();
-        }
-
-        void Write(T value) const
-        {
-            return GetRef().Write(value);
-        }
 
         FPointer operator+(int n) const { return FPointer<T>(_hProcess, (PBYTE)_address + n * sizeof(T)); }
         FPointer operator-(int n) const { return FPointer<T>(_hProcess, (PBYTE)_address - n * sizeof(T)); }
@@ -122,19 +107,13 @@ namespace Foreign
             return tmp;
         }
 
-        FReference<T> operator*() const
-        {
-            return GetRef();
-        }
-
-        FReference<T> operator[](int index) const
-        {
-            return (*this + index).GetRef();
-        }
+        FReference<T> GetRef() const { return FReference<T>(*this); }
+        FReference<T> operator*() const { return GetRef(); }
+        FReference<T> operator[](int index) const { return (*this + index).GetRef(); }
     };
 
     template <class T>
-    FPointer<T> Convert(const FVoidPointer &ptr)
+    FPointer<T> PointerCast(const FVoidPointer &ptr)
     {
         return FPointer<T>(ptr.ProcessHandle(), ptr.Address());
     }
@@ -189,7 +168,7 @@ namespace Foreign
     template <class T>
     FPointer<T> Malloc(HANDLE hProcess, SIZE_T n = 1)
     {
-        return Convert<T>(Malloc(hProcess, sizeof(T) * n));
+        return PointerCast<T>(Malloc(hProcess, sizeof(T) * n));
     }
 
     bool Free(FVoidPointer ptr)
