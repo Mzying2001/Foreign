@@ -113,9 +113,41 @@ namespace Foreign
     };
 
     template <class T>
-    FPointer<T> PointerCast(const FVoidPointer &ptr)
+    FPointer<T> FPointerCast(const FVoidPointer &ptr)
     {
         return FPointer<T>(ptr.ProcessHandle(), ptr.Address());
+    }
+
+    template <class T>
+    FVoidPointer Offset32(const FVoidPointer &base, T offset)
+    {
+        HANDLE hProcess = base.ProcessHandle();
+        UINT32 address = *FPointerCast<decltype(address)>(base) + offset;
+        return FVoidPointer(hProcess, reinterpret_cast<LPVOID>(address));
+    }
+
+    template <class T, class... Args>
+    FVoidPointer Offset32(const FVoidPointer &base, T offset, Args... args)
+    {
+        HANDLE hProcess = base.ProcessHandle();
+        UINT32 address = *FPointerCast<decltype(address)>(base) + offset;
+        return Offset32(FVoidPointer(hProcess, reinterpret_cast<LPVOID>(address)), args...);
+    }
+
+    template <class T>
+    FVoidPointer Offset64(const FVoidPointer &base, T offset)
+    {
+        HANDLE hProcess = base.ProcessHandle();
+        UINT64 address = *FPointerCast<decltype(address)>(base) + offset;
+        return FVoidPointer(hProcess, reinterpret_cast<LPVOID>(address));
+    }
+
+    template <class T, class... Args>
+    FVoidPointer Offset64(const FVoidPointer &base, T offset, Args... args)
+    {
+        HANDLE hProcess = base.ProcessHandle();
+        UINT64 address = *FPointerCast<decltype(address)>(base) + offset;
+        return Offset64(FVoidPointer(hProcess, reinterpret_cast<LPVOID>(address)), args...);
     }
 
     HANDLE OpenProcessHandle(DWORD pid)
@@ -168,7 +200,7 @@ namespace Foreign
     template <class T>
     FPointer<T> Malloc(HANDLE hProcess, SIZE_T n = 1)
     {
-        return PointerCast<T>(Malloc(hProcess, sizeof(T) * n));
+        return FPointerCast<T>(Malloc(hProcess, sizeof(T) * n));
     }
 
     bool Free(FVoidPointer ptr)
