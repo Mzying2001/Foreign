@@ -130,7 +130,7 @@ namespace Foreign
         return OpenProcessHandle(pid);
     }
 
-    HANDLE OpenProcessHandle(LPCSTR className, LPCSTR windowName)
+    HANDLE OpenProcessHandle(LPCSTR windowName, LPCSTR className)
     {
         HWND hwnd = FindWindowA(className, windowName);
         return OpenProcessHandle(hwnd);
@@ -142,7 +142,7 @@ namespace Foreign
         return OpenProcessHandle(hwnd);
     }
 
-    HANDLE OpenProcessHandle(LPCWSTR className, LPCWSTR windowName)
+    HANDLE OpenProcessHandle(LPCWSTR windowName, LPCWSTR className)
     {
         HWND hwnd = FindWindowW(className, windowName);
         return OpenProcessHandle(hwnd);
