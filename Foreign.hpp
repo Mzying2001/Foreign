@@ -151,6 +151,18 @@ namespace Foreign
         return Offset64(FVoidPointer(hProcess, reinterpret_cast<LPVOID>(address)), args...);
     }
 
+    template <class T, class... Args>
+    T OffsetRead32(const FVoidPointer &base, Args... offset)
+    {
+        return *FPointerCast<T>(Offset32(base, offset...));
+    }
+
+    template <class T, class... Args>
+    T OffsetRead64(const FVoidPointer &base, Args... offset)
+    {
+        return *FPointerCast<T>(Offset64(base, offset...));
+    }
+
     HANDLE OpenProcessHandle(DWORD pid)
     {
         return OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
