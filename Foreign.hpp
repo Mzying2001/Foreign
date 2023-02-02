@@ -163,27 +163,15 @@ namespace Foreign
         return OpenProcessHandle(pid);
     }
 
-    HANDLE OpenProcessHandle(LPCSTR windowName, LPCSTR className)
+    HANDLE OpenProcessHandle(LPCSTR windowName, LPCSTR className = NULL)
     {
         HWND hwnd = FindWindowA(className, windowName);
         return OpenProcessHandle(hwnd);
     }
 
-    HANDLE OpenProcessHandle(LPCSTR windowName)
-    {
-        HWND hwnd = FindWindowA(NULL, windowName);
-        return OpenProcessHandle(hwnd);
-    }
-
-    HANDLE OpenProcessHandle(LPCWSTR windowName, LPCWSTR className)
+    HANDLE OpenProcessHandle(LPCWSTR windowName, LPCWSTR className = NULL)
     {
         HWND hwnd = FindWindowW(className, windowName);
-        return OpenProcessHandle(hwnd);
-    }
-
-    HANDLE OpenProcessHandle(LPCWSTR windowName)
-    {
-        HWND hwnd = FindWindowW(NULL, windowName);
         return OpenProcessHandle(hwnd);
     }
 
