@@ -14,10 +14,10 @@ using namespace Foreign;
 
 int main()
 {
-    HANDLE hProcess = OpenProcessHandle("Plants vs. Zombies"); // 通过窗口名获取HANDLE
-    LPVOID base = GetProcessBaseAddress(hProcess);             // 获取游戏的内存基址
+    HANDLE hProcess = OpenProcessHandle("Plants vs. Zombies"); // 通过窗口名获取线程句柄
+    LPVOID base = GetProcessBaseAddress(hProcess);             // 获取游戏的内存起始地址
 
-    // 获取阳光地址，基址和偏移量通过CE获得
+    // 获取阳光地址，基址和偏移量通过CE获得，此处p为基址，pSun为阳光地址
     // PvZ是32位程序，调用Offset32函数计算地址，调用FPointerCast函数转换指针类型
     FVoidPointer p(hProcess, (PBYTE)base + 0x331C50);
     FPointer<int> pSun = FPointerCast<int>(Offset32(p, 0x868, 0x5578));
@@ -30,7 +30,7 @@ int main()
     *pSun = newSun;
     std::cout << "完成" << std::endl;
 
-    CloseProcessHandle(hProcess); // 关闭打开的HANDLE
+    CloseProcessHandle(hProcess); // 关闭打开的线程句柄
     return 0;
 }
 ```
