@@ -30,51 +30,51 @@ namespace Foreign
     };
 
     template <class T>
-    class FReference
-    {
-    private:
-        const FVoidPointer &_refPtr;
-
-    public:
-        FReference(const FVoidPointer &ptr) : _refPtr(ptr) {}
-
-        bool Read(T *pOut, SIZE_T *pNumOfBytesRead = NULL)
-        {
-            return ReadProcessMemory(_refPtr.ProcessHandle(), _refPtr.Address(), pOut, sizeof(T), pNumOfBytesRead);
-        }
-
-        T Read()
-        {
-            T ret;
-            Read(&ret);
-            return ret;
-        }
-
-        bool Write(const T *pIn, SIZE_T *pNumOfBytesWritten = NULL)
-        {
-            return WriteProcessMemory(_refPtr.ProcessHandle(), _refPtr.Address(), pIn, sizeof(T), pNumOfBytesWritten);
-        }
-
-        void Write(const T &value)
-        {
-            Write(&value);
-        }
-
-        operator T()
-        {
-            return Read();
-        }
-
-        FReference<T> &operator=(const T &value)
-        {
-            Write(&value);
-            return *this;
-        }
-    };
-
-    template <class T>
     class FPointer : public FVoidPointer
     {
+    private:
+        class FReference
+        {
+        private:
+            const FPointer &_refPtr;
+
+        public:
+            FReference(const FPointer &ptr) : _refPtr(ptr) {}
+
+            bool Read(T *pOut, SIZE_T *pNumOfBytesRead = NULL)
+            {
+                return ReadProcessMemory(_refPtr.ProcessHandle(), _refPtr.Address(), pOut, sizeof(T), pNumOfBytesRead);
+            }
+
+            T Read()
+            {
+                T ret;
+                Read(&ret);
+                return ret;
+            }
+
+            bool Write(const T *pIn, SIZE_T *pNumOfBytesWritten = NULL)
+            {
+                return WriteProcessMemory(_refPtr.ProcessHandle(), _refPtr.Address(), pIn, sizeof(T), pNumOfBytesWritten);
+            }
+
+            void Write(const T &value)
+            {
+                Write(&value);
+            }
+
+            operator T()
+            {
+                return Read();
+            }
+
+            FReference &operator=(const T &value)
+            {
+                Write(&value);
+                return *this;
+            }
+        };
+
     public:
         FPointer(HANDLE processHandle, LPVOID address) : FVoidPointer(processHandle, address) {}
         FPointer(HANDLE processHandle) : FVoidPointer(processHandle, NULL) {}
@@ -108,9 +108,9 @@ namespace Foreign
             return tmp;
         }
 
-        FReference<T> GetRef() const { return FReference<T>(*this); }
-        FReference<T> operator*() const { return GetRef(); }
-        FReference<T> operator[](int index) const { return (*this + index).GetRef(); }
+        FReference GetRef() const { return FReference(*this); }
+        FReference operator*() const { return GetRef(); }
+        FReference operator[](int index) const { return (*this + index).GetRef(); }
     };
 
     template <class T>
